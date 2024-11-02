@@ -1,0 +1,5 @@
+{
+	"logRoot": "C:/Logs",
+	"downloadRoot": "C:/Output",
+	"downloadUsers": ["User1", "User2"]
+}

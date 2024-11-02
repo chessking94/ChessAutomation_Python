@@ -1,0 +1,9 @@
+# directories
+.vscode/
+.venv/
+logs/
+output/
+__pycache__
+
+# files
+config.json
