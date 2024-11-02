@@ -1,4 +1,4 @@
-import argparse
+# import argparse
 import datetime as dt
 import json
 import logging
@@ -204,33 +204,36 @@ def LichessUserUpdate(username):
 
 
 def main():
-    vrs_num = '3.0'
-    parser = argparse.ArgumentParser(
-        description='Chess.com and Lichess User Updater',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        usage=argparse.SUPPRESS
-    )
-    parser.add_argument(
-        '-v', '--version',
-        action='version',
-        version='%(prog)s ' + vrs_num
-    )
-    parser.add_argument(
-        '-u', '--username',
-        help='Username'
-    )
-    parser.add_argument(
-        '-s', '--site',
-        default=None,
-        nargs='?',
-        choices=['Chess.com', 'Lichess'],
-        help='Website of user'
-    )
-    args = parser.parse_args()
-    config = vars(args)
+    # vrs_num = '3.0'
+    # parser = argparse.ArgumentParser(
+    #     description='Chess.com and Lichess User Updater',
+    #     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    #     usage=argparse.SUPPRESS
+    # )
+    # parser.add_argument(
+    #     '-v', '--version',
+    #     action='version',
+    #     version='%(prog)s ' + vrs_num
+    # )
+    # parser.add_argument(
+    #     '-u', '--username',
+    #     help='Username'
+    # )
+    # parser.add_argument(
+    #     '-s', '--site',
+    #     default=None,
+    #     nargs='?',
+    #     choices=['Chess.com', 'Lichess'],
+    #     help='Website of user'
+    # )
+    # args = parser.parse_args()
+    # config = vars(args)
 
-    username = config['username']
-    site = config['site']
+    # username = config['username']
+    # site = config['site']
+
+    username = None
+    site = None
 
     if username and not site:
         logging.critical(f'Username {username} provided but no site provided!')
