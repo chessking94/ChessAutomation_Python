@@ -20,7 +20,7 @@ def ChessComUserUpdate(username):
     engine = sa.create_engine(connection_url)
     conn = engine.connect().connection
 
-    qry_text = "SELECT PlayerID, Username FROM UsernameXRef WHERE Source = 'Chess.com' AND UserStatus NOT IN ('DNE')"
+    qry_text = "SELECT PlayerID, Username FROM ChessWarehouse.dbo.UsernameXRef WHERE Source = 'Chess.com' AND UserStatus NOT IN ('DNE')"
     if username:
         qry_text = qry_text + f" AND Username = '{username}'"
     logging.debug(qry_text)
@@ -42,10 +42,10 @@ def ChessComUserUpdate(username):
                 if resp.status_code != 200:
                     logging.warning(f'Unable to complete request to {url}! Request returned code {resp.status_code}')
                     if resp.status_code == 404:
-                        sql_cmd = f"UPDATE UsernameXRef SET UserStatus = 'DNE' WHERE PlayerID = {i[0]}"
+                        sql_cmd = f"UPDATE ChessWarehouse.dbo.UsernameXRef SET UserStatus = 'DNE' WHERE PlayerID = {i[0]}"
                     else:
                         # could handle these differently, but should happen very rarely if ever
-                        sql_cmd = f"UPDATE UsernameXRef SET UserStatus = NULL WHERE PlayerID = {i[0]}"
+                        sql_cmd = f"UPDATE ChessWarehouse.dbo.UsernameXRef SET UserStatus = NULL WHERE PlayerID = {i[0]}"
                 else:
                     # last active datetime and status
                     json_data = resp.content
@@ -89,7 +89,7 @@ def ChessComUserUpdate(username):
                                 daily_games = sum(v for k, v in json_rating_loaded['chess_daily']['record'].items() if k in sum_keys)
 
                             # set SQL command
-                            sql_cmd = f"UPDATE UsernameXRef SET LastActiveOnline = '{sql_date}'"
+                            sql_cmd = f"UPDATE ChessWarehouse.dbo.UsernameXRef SET LastActiveOnline = '{sql_date}'"
                             sql_cmd = sql_cmd + f", UserStatus = '{user_status}'"
                             sql_cmd = sql_cmd + f', BulletRating = {bullet_rating}'
                             sql_cmd = sql_cmd + f', BlitzRating = {blitz_rating}'
@@ -121,7 +121,7 @@ def LichessUserUpdate(username):
     engine = sa.create_engine(connection_url)
     conn = engine.connect().connection
 
-    qry_text = "SELECT PlayerID, Username FROM UsernameXRef WHERE Source = 'Lichess' AND UserStatus NOT IN ('DNE')"
+    qry_text = "SELECT PlayerID, Username FROM ChessWarehouse.dbo.UsernameXRef WHERE Source = 'Lichess' AND UserStatus NOT IN ('DNE')"
     if username:
         qry_text = qry_text + f" AND Username = '{username}'"
     logging.debug(qry_text)
@@ -143,15 +143,15 @@ def LichessUserUpdate(username):
                 if resp.status_code != 200:
                     logging.warning(f'Unable to complete request to {url}! Request returned code {resp.status_code}')
                     if resp.status_code == 404:
-                        sql_cmd = f"UPDATE UsernameXRef SET UserStatus = 'DNE' WHERE PlayerID = {i[0]}"
+                        sql_cmd = f"UPDATE ChessWarehouse.dbo.UsernameXRef SET UserStatus = 'DNE' WHERE PlayerID = {i[0]}"
                     else:
                         # could handle these differently, but should happen very rarely if ever
-                        sql_cmd = f"UPDATE UsernameXRef SET UserStatus = NULL WHERE PlayerID = {i[0]}"
+                        sql_cmd = f"UPDATE ChessWarehouse.dbo.UsernameXRef SET UserStatus = NULL WHERE PlayerID = {i[0]}"
                 else:
                     json_data = resp.content
                     json_loaded = json.loads(json_data)
                     if json_loaded.get('disabled'):
-                        sql_cmd = f"UPDATE UsernameXRef SET UserStatus = 'Closed' WHERE PlayerID = {i[0]}"
+                        sql_cmd = f"UPDATE ChessWarehouse.dbo.UsernameXRef SET UserStatus = 'Closed' WHERE PlayerID = {i[0]}"
                     else:
                         # last active datetime
                         last_online = json_loaded.get('seenAt')//1000
@@ -180,7 +180,7 @@ def LichessUserUpdate(username):
                             daily_games = json_loaded['perfs']['correspondence'].get('games')
 
                         # set SQL command
-                        sql_cmd = f"UPDATE UsernameXRef SET LastActiveOnline = '{sql_date}'"
+                        sql_cmd = f"UPDATE ChessWarehouse.dbo.UsernameXRef SET LastActiveOnline = '{sql_date}'"
                         sql_cmd = sql_cmd + ", UserStatus = 'Open'"
                         sql_cmd = sql_cmd + f', BulletRating = {bullet_rating}'
                         sql_cmd = sql_cmd + f', BlitzRating = {blitz_rating}'
