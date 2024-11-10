@@ -295,7 +295,7 @@ def processfiles():
     os.remove(live_tag_full)
 
     old_name = os.path.join(output_path, sort_name)
-    new_name = os.path.join(output_path, f'PersonalOnline_All_{yyyy}{mm}{os.path.splitext(sort_name)[1]}')
+    new_name = os.path.join(output_path, f'PersonalOnline_All{os.path.splitext(sort_name)[1]}')
     os.rename(old_name, new_name)
 
     # delete empty files, if no games are in a file
