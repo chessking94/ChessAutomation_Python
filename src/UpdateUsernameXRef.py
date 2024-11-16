@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 def ChessComUserUpdate(username):
-    conn_str = os.getenv('ConnectionStringRelease')
+    conn_str = os.getenv('ConnectionStringOdbcRelease')
     connection_url = sa.engine.URL.create(
         drivername='mssql+pyodbc',
         query={"odbc_connect": conn_str}
@@ -113,7 +113,7 @@ def ChessComUserUpdate(username):
 
 
 def LichessUserUpdate(username):
-    conn_str = os.getenv('ConnectionStringRelease')
+    conn_str = os.getenv('ConnectionStringOdbcRelease')
     connection_url = sa.engine.URL.create(
         drivername='mssql+pyodbc',
         query={"odbc_connect": conn_str}
