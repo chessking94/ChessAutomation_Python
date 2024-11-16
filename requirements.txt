@@ -1,6 +1,6 @@
-automation>=1.7.0
 pandas>=2.2.3
 pyodbc>=5.2.0
 python-chess>=1.999
 requests>=2.32.3
 sqlalchemy>=2.0.36
+Utilities_Python>=1.0.1

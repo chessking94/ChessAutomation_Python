@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from automation import misc
+from Utilities_Python import misc
 
 from config import CONFIG_FILE
 import MonthlyGameDownload

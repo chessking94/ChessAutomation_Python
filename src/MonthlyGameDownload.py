@@ -10,7 +10,7 @@ import pandas as pd
 import requests
 import sqlalchemy as sa
 
-from automation import misc
+from Utilities_Python import misc
 
 from config import CONFIG_FILE
 
