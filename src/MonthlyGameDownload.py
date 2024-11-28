@@ -62,7 +62,7 @@ def chesscomgames():
         dload_file = os.path.join(dload_path, dload_name)
         with requests.get(url, stream=True, headers=headers) as resp:
             if resp.status_code != 200:
-                logging.warning(f'Unable to complete request to {url}! Request returned code {resp.status_code}')
+                logging.error(f'Unable to complete request to {url}! Request returned code {resp.status_code}')
             else:
                 with open(dload_file, 'wb') as f:
                     for chunk in resp.iter_content(chunk_size=8196):
@@ -122,9 +122,12 @@ def lichessgames():
         dload_name = f'{i[1]}_{yyyy}{mm}.pgn'
         dload_file = os.path.join(dload_path, dload_name)
         with requests.get(dload_url, headers=headers, stream=True) as resp:
-            with open(dload_file, 'wb') as f:
-                for chunk in resp.iter_content(chunk_size=8196):
-                    f.write(chunk)
+            if resp.status_code != 200:
+                logging.error(f'Unable to complete request to {dload_url}! Request returned code {resp.status_code}')
+            else:
+                with open(dload_file, 'wb') as f:
+                    for chunk in resp.iter_content(chunk_size=8196):
+                        f.write(chunk)
 
     file_list = [f for f in os.listdir(dload_path) if os.path.isfile(os.path.join(dload_path, f))]
     if len(file_list) > 0:
