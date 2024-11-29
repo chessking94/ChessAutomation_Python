@@ -1,5 +1,6 @@
 {
 	"logRoot": "C:/Logs",
 	"downloadRoot": "C:/Output",
-	"downloadUsers": ["User1", "User2"]
+	"downloadUsers": ["User1", "User2"],
+	"chessbaseDir": "C:/Chessbase"
 }

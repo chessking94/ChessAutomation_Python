@@ -298,7 +298,8 @@ def processfiles():
     os.remove(live_tag_full)
 
     old_name = os.path.join(output_path, sort_name)
-    new_name = os.path.join(output_path, f'PersonalOnline_All{os.path.splitext(sort_name)[1]}')
+    all_name = f'PersonalOnline_All{os.path.splitext(sort_name)[1]}'
+    new_name = os.path.join(output_path, all_name)
     os.rename(old_name, new_name)
 
     # delete empty files, if no games are in a file
@@ -306,6 +307,13 @@ def processfiles():
     for f in dir_files:
         if os.path.getsize(os.path.join(output_path, f)) == 0:
             os.remove(os.path.join(output_path, f))
+
+    # move all remaining files not named 'PersonalOnline_All.pgn' to a different directory (are for Chessbase)
+    chessbase_dir = misc.get_config('chessbaseDir', CONFIG_FILE)
+    dir_files = [f for f in os.listdir(output_path) if os.path.isfile(os.path.join(output_path, f))]
+    for f in dir_files:
+        if f != all_name:
+            os.rename(os.path.join(output_path, f), os.path.join(chessbase_dir, f))
 
 
 def main():
