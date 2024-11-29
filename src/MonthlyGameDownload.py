@@ -313,7 +313,7 @@ def processfiles():
     dir_files = [f for f in os.listdir(output_path) if os.path.isfile(os.path.join(output_path, f))]
     for f in dir_files:
         if f != all_name:
-            os.rename(os.path.join(output_path, f), os.path.join(chessbase_dir, f))
+            sh.move(os.path.join(output_path, f), os.path.join(chessbase_dir, f))
 
 
 def main():
