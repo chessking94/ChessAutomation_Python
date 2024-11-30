@@ -310,10 +310,11 @@ def processfiles():
 
     # move all remaining files not named 'PersonalOnline_All.pgn' to a different directory (are for Chessbase)
     chessbase_dir = misc.get_config('chessbaseDir', CONFIG_FILE)
-    dir_files = [f for f in os.listdir(output_path) if os.path.isfile(os.path.join(output_path, f))]
-    for f in dir_files:
-        if f != all_name:
-            sh.move(os.path.join(output_path, f), os.path.join(chessbase_dir, f))
+    if os.path.isdir(chessbase_dir):
+        dir_files = [f for f in os.listdir(output_path) if os.path.isfile(os.path.join(output_path, f))]
+        for f in dir_files:
+            if f != all_name:
+                sh.move(os.path.join(output_path, f), os.path.join(chessbase_dir, f))
 
     # send completion notification
     tg_msg = f'MonthlyGameDownload for {yyyy}-{mm} has completed'
