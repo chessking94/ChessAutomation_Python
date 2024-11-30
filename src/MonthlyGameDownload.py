@@ -10,7 +10,7 @@ import pandas as pd
 import requests
 import sqlalchemy as sa
 
-from Utilities_Python import misc
+from Utilities_Python import misc, notifications
 
 from config import CONFIG_FILE
 
@@ -314,6 +314,10 @@ def processfiles():
     for f in dir_files:
         if f != all_name:
             sh.move(os.path.join(output_path, f), os.path.join(chessbase_dir, f))
+
+    # send completion notification
+    tg_msg = f'MonthlyGameDownload for {yyyy}-{mm} has completed'
+    notifications.SendTelegramMessage(tg_msg)
 
 
 def main():
