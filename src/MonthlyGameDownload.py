@@ -3,6 +3,8 @@ import fileinput
 import logging
 import os
 import shutil as sh
+import socket
+import subprocess
 
 import chess
 import chess.pgn
@@ -13,6 +15,12 @@ import sqlalchemy as sa
 from Utilities_Python import misc, notifications
 
 from config import CONFIG_FILE
+
+
+def check_for_pgnextract():
+    result = subprocess.run('pgn-extract -h', shell=True, capture_output=True)
+    if 'is not recognized' in str(result.stderr):
+        raise RuntimeError(f'pgn-extract not found on {socket.gethostbyname()}')
 
 
 def archiveold():
@@ -314,7 +322,15 @@ def processfiles():
         dir_files = [f for f in os.listdir(output_path) if os.path.isfile(os.path.join(output_path, f))]
         for f in dir_files:
             if f != all_name:
-                sh.move(os.path.join(output_path, f), os.path.join(chessbase_dir, f))
+                # since chessbase_dir might be on an unavailable network drive, handle possible exceptions
+                try:
+                    sh.move(os.path.join(output_path, f), os.path.join(chessbase_dir, f))
+                except Exception as e:
+                    notifications.SendTelegramMessage(f"MonthlyGameDownload: Unable to move file'{f}' to '{chessbase_dir}' ({str(e)})")
+                    error_dir = os.path.join(output_path, 'Errors')
+                    if not os.path.isdir(error_dir):
+                        os.mkdir(error_dir)
+                    sh.move(os.path.join(output_path, f), os.path.join(output_path, 'Errors', f))
 
     # send completion notification
     tg_msg = f'MonthlyGameDownload for {yyyy}-{mm} has completed'
@@ -322,7 +338,7 @@ def processfiles():
 
 
 def main():
-    # TODO: test for pgn-extract
+    check_for_pgnextract()
     archiveold()
     chesscomgames()
     lichessgames()
