@@ -15,7 +15,7 @@ def ChessComUserUpdate(username):
     conn_str = os.getenv('ConnectionStringOdbcRelease')
     connection_url = sa.engine.URL.create(
         drivername='mssql+pyodbc',
-        query={"odbc_connect": conn_str}
+        query={'odbc_connect': conn_str}
     )
     engine = sa.create_engine(connection_url)
     conn = engine.connect().connection
@@ -116,7 +116,7 @@ def LichessUserUpdate(username):
     conn_str = os.getenv('ConnectionStringOdbcRelease')
     connection_url = sa.engine.URL.create(
         drivername='mssql+pyodbc',
-        query={"odbc_connect": conn_str}
+        query={'odbc_connect': conn_str}
     )
     engine = sa.create_engine(connection_url)
     conn = engine.connect().connection

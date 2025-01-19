@@ -43,7 +43,7 @@ def chesscomgames():
     conn_str = os.getenv('ConnectionStringOdbcRelease')
     connection_url = sa.engine.URL.create(
         drivername='mssql+pyodbc',
-        query={"odbc_connect": conn_str}
+        query={'odbc_connect': conn_str}
     )
     engine = sa.create_engine(connection_url)
 
@@ -100,7 +100,7 @@ def lichessgames():
     conn_str = os.getenv('ConnectionStringOdbcRelease')
     connection_url = sa.engine.URL.create(
         drivername='mssql+pyodbc',
-        query={"odbc_connect": conn_str}
+        query={'odbc_connect': conn_str}
     )
     engine = sa.create_engine(connection_url)
 
@@ -326,7 +326,7 @@ def processfiles():
                 try:
                     sh.move(os.path.join(output_path, f), os.path.join(chessbase_dir, f))
                 except Exception as e:
-                    notifications.SendTelegramMessage(f"MonthlyGameDownload: Unable to move file'{f}' to '{chessbase_dir}' ({str(e)})")
+                    notifications.SendTelegramMessage(f"MonthlyGameDownload: Unable to move file '{f}' to '{chessbase_dir}' ({str(e)})")
                     error_dir = os.path.join(output_path, 'Errors')
                     if not os.path.isdir(error_dir):
                         os.mkdir(error_dir)
