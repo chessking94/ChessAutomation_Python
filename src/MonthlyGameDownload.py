@@ -78,8 +78,13 @@ def chesscomgames():
 
     file_list = [f for f in os.listdir(dload_path) if os.path.isfile(os.path.join(dload_path, f))]
     if len(file_list) > 0:
-        merge_name = dload_name
-        clean_name = f'ChessCom_{users[0][1]}_{yyyy}{mm}.pgn'
+        merge_name = 'merge.pgn'
+        cmd_text = f'copy /B *.pgn {merge_name}'
+        if os.getcwd != dload_path:
+            os.chdir(dload_path)
+        os.system('cmd /C ' + cmd_text)
+
+        clean_name = f'ChessCom_{yyyy}{mm}.pgn'
         cmd_text = f'pgn-extract -N -V -D --quiet --output {clean_name} {merge_name} >nul'
         if os.getcwd != dload_path:
             os.chdir(dload_path)
@@ -139,8 +144,13 @@ def lichessgames():
 
     file_list = [f for f in os.listdir(dload_path) if os.path.isfile(os.path.join(dload_path, f))]
     if len(file_list) > 0:
-        merge_name = dload_name
-        clean_name = f'Lichess_{users[0][1]}_{yyyy}{mm}.pgn'
+        merge_name = 'merge.pgn'
+        cmd_text = f'copy /B *.pgn {merge_name}'
+        if os.getcwd != dload_path:
+            os.chdir(dload_path)
+        os.system('cmd /C ' + cmd_text)
+
+        clean_name = f'Lichess_{yyyy}{mm}.pgn'
         cmd_text = f'pgn-extract -N -V -D --quiet --output {clean_name} {merge_name} >nul'
         if os.getcwd != dload_path:
             os.chdir(dload_path)
