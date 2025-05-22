@@ -227,7 +227,17 @@ def processfiles():
     pgn.close()
 
     # create White and Black files
-    users = misc.get_config('downloadUsers', CONFIG_FILE)
+    conn_str = os.getenv('ConnectionStringOdbcRelease')
+    connection_url = sa.engine.URL.create(
+        drivername='mssql+pyodbc',
+        query={'odbc_connect': conn_str}
+    )
+    engine = sa.create_engine(connection_url)
+
+    qry_text = "SELECT DISTINCT Username FROM ChessWarehouse.dbo.UsernameXRef WHERE SelfFlag = 1 AND UserStatus = 'Open'"
+    df = pd.read_sql(qry_text, engine)
+    users = df['Username'].tolist()
+    engine.dispose()
 
     white_tag = 'WhiteTag.txt'
     white_tag_full = os.path.join(output_path, white_tag)

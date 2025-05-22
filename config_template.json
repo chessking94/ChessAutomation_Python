@@ -1,6 +1,5 @@
 {
 	"logRoot": "$(PYTHON_LOG_ROOT)",
 	"downloadRoot": "$(DOWNLOAD_ROOT)",
-	"downloadUsers": ["$(CDC_USER1)", "$(LICHESS_USER1)"],
 	"chessbaseDir": "$(CHESSBASE_DIR)"
 }
