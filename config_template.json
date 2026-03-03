@@ -1,7 +1,12 @@
 {
 	"logRoot": "$(PYTHON_LOG_ROOT)",
 	"GAMES": {
-		"downloadRoot": "$(DOWNLOAD_ROOT)",
-		"chessbaseDir": "$(CHESSBASE_DIR)"
+		"downloadRoot": "$(GAMES_DOWNLOAD_ROOT)",
+		"chessbaseDir": "$(GAMES_CHESSBASE_DIR)"
+	},
+	"TWIC": {
+		"downloadDir": "$(TWIC_DOWNLOAD_DIR)",
+		"backupDir": "$(TWIC_BACKUP_DIR)",
+		"outputDir": "$(TWIC_OUTPUT_DIR)"
 	}
 }

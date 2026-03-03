@@ -28,8 +28,11 @@ jobs:
           files: 'config.json'
         env:
           PYTHON_LOG_ROOT: ${{ vars.PYTHON_LOG_ROOT }}
-          DOWNLOAD_ROOT: ${{ vars.DOWNLOAD_ROOT }}
-          CHESSBASE_DIR: ${{ vars.CHESSBASE_DIR }}
+          GAMES_DOWNLOAD_ROOT: ${{ vars.GAMES_DOWNLOAD_ROOT }}
+          GAMES_CHESSBASE_DIR: ${{ vars.GAMES_CHESSBASE_DIR }}
+          TWIC_DOWNLOAD_DIR: ${{ vars.TWIC_DOWNLOAD_DIR }}
+          TWIC_BACKUP_DIR: ${{ vars.TWIC_BACKUP_DIR }}
+          TWIC_OUTPUT_DIR: ${{ vars.TWIC_OUTPUT_DIR }}
 
       - name: Clear old files
         run: |
