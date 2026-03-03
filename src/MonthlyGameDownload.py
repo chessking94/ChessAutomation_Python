@@ -3,8 +3,6 @@ import fileinput
 import logging
 import os
 import shutil as sh
-import socket
-import subprocess
 
 import chess
 import chess.pgn
@@ -12,20 +10,13 @@ import pandas as pd
 import requests
 import sqlalchemy as sa
 
-from Utilities_Python import misc, notifications
+from Utilities_Python import notifications
 
-from config import CONFIG_FILE
-
-
-def check_for_pgnextract():
-    result = subprocess.run('pgn-extract -h', shell=True, capture_output=True)
-    if 'is not recognized' in str(result.stderr):
-        raise RuntimeError(f'pgn-extract not found on {socket.gethostbyname()}')
+CONFIG = {}
 
 
 def archiveold():
-    # TODO: do I want to delete old files in the long run?
-    output_path = misc.get_config('downloadRoot', CONFIG_FILE)
+    output_path = CONFIG.get('downloadRoot')
     archive_path = os.path.join(output_path, 'archive')
 
     if not os.path.isdir(archive_path):
@@ -58,7 +49,7 @@ def chesscomgames():
     yyyy = lastMonth.strftime('%Y')
     mm = lastMonth.strftime('%m')
 
-    dload_root = misc.get_config('downloadRoot', CONFIG_FILE)
+    dload_root = CONFIG.get('downloadRoot')
     dload_path = os.path.join(dload_root, 'ChessCom')
     if not os.path.isdir(dload_path):
         os.mkdir(dload_path)  # root will already exist, that is checked earlier in process
@@ -124,7 +115,7 @@ def lichessgames():
     yyyy = lastmonth.strftime('%Y')
     mm = lastmonth.strftime('%m')
 
-    dload_root = misc.get_config('downloadRoot', CONFIG_FILE)
+    dload_root = CONFIG.get('downloadRoot')
     dload_path = os.path.join(dload_root, 'Lichess')
     if not os.path.isdir(dload_path):
         os.mkdir(dload_path)  # root will already exist, that is checked earlier in process
@@ -168,7 +159,7 @@ def lichessgames():
 
 
 def processfiles():
-    output_path = misc.get_config('downloadRoot', CONFIG_FILE)
+    output_path = CONFIG.get('downloadRoot')
 
     today = dt.date.today()
     first = today.replace(day=1)
@@ -337,7 +328,7 @@ def processfiles():
             os.remove(os.path.join(output_path, f))
 
     # move all remaining files not named 'PersonalOnline_All.pgn' to a different directory (are for Chessbase)
-    chessbase_dir = misc.get_config('chessbaseDir', CONFIG_FILE)
+    chessbase_dir = CONFIG.get('chessbaseDir')
     if os.path.isdir(chessbase_dir):
         dir_files = [f for f in os.listdir(output_path) if os.path.isfile(os.path.join(output_path, f))]
         for f in dir_files:
@@ -357,13 +348,12 @@ def processfiles():
     notifications.SendTelegramMessage(tg_msg)
 
 
-def main():
-    check_for_pgnextract()
+def main(config: dict):
+    global CONFIG
+    if isinstance(config, dict):
+        CONFIG = config
+
     archiveold()
     chesscomgames()
     lichessgames()
     processfiles()
-
-
-if __name__ == '__main__':
-    main()

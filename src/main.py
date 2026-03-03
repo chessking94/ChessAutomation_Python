@@ -1,16 +1,29 @@
 import argparse
 import logging
+import os
+from pathlib import Path
+import socket
+import subprocess
 
 from Utilities_Python import misc
 
-from config import CONFIG_FILE
+import DownloadTWIC
 import MonthlyGameDownload
 import UpdateUsernameXRef
 
 PROCESS_CHOICES = [
     'GAMES',
+    'TWIC',
     'USERS'
 ]
+
+CONFIG_FILE = os.path.join(Path(__file__).parents[1], 'config.json')
+
+
+def check_for_pgnextract():
+    result = subprocess.run('pgn-extract -h', shell=True, capture_output=True)
+    if 'is not recognized' in str(result.stderr):
+        raise RuntimeError(f'pgn-extract not found on {socket.gethostname()}')
 
 
 def main():
@@ -40,6 +53,8 @@ def main():
             script_name = 'ChessAutomationPython'  # need to set something
         case 'GAMES':
             script_name = 'MonthlyGameDownload'
+        case 'TWIC':
+            script_name = 'DownloadTWIC'
         case 'USERS':
             script_name = 'UpdateUsernameXRef'
 
@@ -49,7 +64,13 @@ def main():
         case None:
             logging.error('No process parameter passed to ChessAutomation_Python')
         case 'GAMES':
-            MonthlyGameDownload.main()
+            check_for_pgnextract()
+            config = misc.get_config(process_name, CONFIG_FILE)
+            MonthlyGameDownload.main(config)
+        case 'TWIC':
+            check_for_pgnextract()
+            config = misc.get_config(process_name, CONFIG_FILE)
+            DownloadTWIC.main(config)
         case 'USERS':
             UpdateUsernameXRef.main()
 

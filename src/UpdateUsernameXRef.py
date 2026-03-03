@@ -243,7 +243,3 @@ def main():
         ChessComUserUpdate(username)
     if site in ['Lichess', None]:
         LichessUserUpdate(username)
-
-
-if __name__ == '__main__':
-    main()
