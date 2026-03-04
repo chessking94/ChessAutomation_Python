@@ -9,10 +9,12 @@ from Utilities_Python import misc
 
 import DownloadTWIC
 import MonthlyGameDownload
+import UpdateMoveScores
 import UpdateUsernameXRef
 
 PROCESS_CHOICES = [
     'GAMES',
+    'MOVESCORES',
     'TWIC',
     'USERS'
 ]
@@ -53,6 +55,8 @@ def main():
             script_name = 'ChessAutomationPython'  # need to set something
         case 'GAMES':
             script_name = 'MonthlyGameDownload'
+        case 'MOVESCORES':
+            script_name = 'UpdateMoveScores'
         case 'TWIC':
             script_name = 'DownloadTWIC'
         case 'USERS':
@@ -67,6 +71,8 @@ def main():
             check_for_pgnextract()
             config = misc.get_config(process_name, CONFIG_FILE)
             MonthlyGameDownload.main(config)
+        case 'MOVESCORES':
+            UpdateMoveScores.main()
         case 'TWIC':
             check_for_pgnextract()
             config = misc.get_config(process_name, CONFIG_FILE)
