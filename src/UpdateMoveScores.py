@@ -22,7 +22,7 @@ WHERE fh.FileTypeID = 3
 GROUP BY fh.FileID
 
 HAVING COUNT(g.GameID) = SUM(CASE WHEN g.AnalysisStatusID = 3 THEN 1 ELSE 0 END)  --all games were analyzed successfully
-AND COUNT(g.GameID) = SUM(CASE WHEN m.GameID IS NULL THEN 1 ELSE 0 END)  --all games have yet to be scored
+AND COUNT(g.GameID) = SUM(CASE WHEN m.GameID IS NOT NULL THEN 1 ELSE 0 END)  --all games have yet to be scored
 '''
     with conn.cursor() as csr:
         csr.execute(sql_cmd)
