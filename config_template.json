@@ -1,8 +1,23 @@
 {
 	"logRoot": "$(PYTHON_LOG_ROOT)",
+	"ANALYZE": {
+		"rabbitmqHost": "$(RABBITMQ_HOST)",
+		"rabbitmqUser": "$(RABBITMQ_USER)",
+		"rabbitmqPass": "$(RABBITMQ_PASS)",
+		"rabbitmqRoute": "$(ANALYSIS_RABBITMQ_ROUTE)",
+		"analysisEnv": "$(ANALYZE_PYTHON_PATH)",
+		"analysisProgram": "$(ANALYZE_PROGRAM_PATH)"
+	},
 	"GAMES": {
 		"downloadRoot": "$(GAMES_DOWNLOAD_ROOT)",
 		"chessbaseDir": "$(GAMES_CHESSBASE_DIR)"
+	},
+	"QUEUEANALYSIS": {
+		"rabbitmqHost": "$(RABBITMQ_HOST)",
+		"rabbitmqUser": "$(RABBITMQ_USER)",
+		"rabbitmqPass": "$(RABBITMQ_PASS)",
+		"rabbitmqRoute": "$(ANALYSIS_RABBITMQ_ROUTE)",
+		"analysisDir": "$(ANALYSIS_QUEUE_DIR)"
 	},
 	"TWIC": {
 		"downloadDir": "$(TWIC_DOWNLOAD_DIR)",
