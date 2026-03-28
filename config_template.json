@@ -23,6 +23,7 @@
 		"analysisDir": "$(ANALYSIS_QUEUE_DIR)"
 	},
 	"TWIC": {
+		"connectionString": "$(CONNECTION_STRING)",
 		"downloadDir": "$(TWIC_DOWNLOAD_DIR)",
 		"backupDir": "$(TWIC_BACKUP_DIR)",
 		"outputDir": "$(TWIC_OUTPUT_DIR)"
