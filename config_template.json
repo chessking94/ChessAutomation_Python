@@ -9,7 +9,9 @@
 		"analysisProgram": "$(ANALYZE_PROGRAM_PATH)"
 	},
 	"GAMES": {
+		"connectionString": "$(CONNECTION_STRING)",
 		"downloadRoot": "$(GAMES_DOWNLOAD_ROOT)",
+		"analysisDir": "$(ANALYSIS_QUEUE_DIR)",
 		"chessbaseDir": "$(GAMES_CHESSBASE_DIR)"
 	},
 	"MOVESCORES": {
