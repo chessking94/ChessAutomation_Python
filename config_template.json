@@ -12,6 +12,9 @@
 		"downloadRoot": "$(GAMES_DOWNLOAD_ROOT)",
 		"chessbaseDir": "$(GAMES_CHESSBASE_DIR)"
 	},
+	"MOVESCORES": {
+		"connectionString": "$(CONNECTION_STRING)"
+	},
 	"QUEUEANALYSIS": {
 		"rabbitmqHost": "$(RABBITMQ_HOST)",
 		"rabbitmqUser": "$(RABBITMQ_USER)",
