@@ -29,5 +29,8 @@
 		"downloadDir": "$(TWIC_DOWNLOAD_DIR)",
 		"backupDir": "$(TWIC_BACKUP_DIR)",
 		"outputDir": "$(TWIC_OUTPUT_DIR)"
+	},
+	"USERS": {
+		"connectionString": "$(CONNECTION_STRING)"
 	}
 }
