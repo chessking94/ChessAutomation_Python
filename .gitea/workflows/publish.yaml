@@ -28,8 +28,16 @@ jobs:
           files: 'config.json'
         env:
           PYTHON_LOG_ROOT: ${{ vars.PYTHON_LOG_ROOT }}
+          RABBITMQ_HOST: ${{ vars.RABBITMQ_HOST }}
+          RABBITMQ_USER: ${{ vars.RABBITMQ_USER }}
+          RABBITMQ_PASS: ${{ secrets.RABBITMQ_PASS }}
+          CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+          ANALYSIS_RABBITMQ_ROUTE: ${{ vars.ANALYSIS_RABBITMQ_ROUTE }}
+          ANALYZE_PYTHON_PATH: ${{ vars.ANALYZE_PYTHON_PATH }}
+          ANALYZE_PROGRAM_PATH: ${{ vars.ANALYZE_PROGRAM_PATH }}
           GAMES_DOWNLOAD_ROOT: ${{ vars.GAMES_DOWNLOAD_ROOT }}
           GAMES_CHESSBASE_DIR: ${{ vars.GAMES_CHESSBASE_DIR }}
+          ANALYSIS_QUEUE_DIR: ${{ vars.ANALYSIS_QUEUE_DIR }}
           TWIC_DOWNLOAD_DIR: ${{ vars.TWIC_DOWNLOAD_DIR }}
           TWIC_BACKUP_DIR: ${{ vars.TWIC_BACKUP_DIR }}
           TWIC_OUTPUT_DIR: ${{ vars.TWIC_OUTPUT_DIR }}
