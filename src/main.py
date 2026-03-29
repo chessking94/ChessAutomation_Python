@@ -69,7 +69,7 @@ def main():
         if process_object.require_pgnextract():
             process_object.check_for_pgnextract()
 
-        test_mode = True
+        test_mode = False
         process_config = misc.get_config(process_name, CONFIG_FILE)
         process_object.main(process_config, test_mode)
 
