@@ -16,10 +16,14 @@ class base(ABC):
         self.config = {}
         self.test_mode = False
 
+    def set_shared_config(self, config: dict):
+        if isinstance(config, dict):
+            self.config = config
+
     def main(self, config: dict | None, test_mode: bool = False):
         """ Entry point for the module """
         if isinstance(config, dict):
-            self.config = config
+            self.config.update(config)
 
         self.test_mode = test_mode
         self._go()

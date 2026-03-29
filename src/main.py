@@ -63,12 +63,15 @@ def main():
         err_msg += ', '.join(modules.keys()) + ')'
         logging.critical(err_msg)
     else:
-        test_mode = False
-        config = misc.get_config(process_name, CONFIG_FILE)
+        shared_config = misc.get_config('environment', CONFIG_FILE)
+        process_object.set_shared_config(shared_config)
+
         if process_object.require_pgnextract():
             process_object.check_for_pgnextract()
 
-        process_object.main(config, test_mode)
+        test_mode = True
+        process_config = misc.get_config(process_name, CONFIG_FILE)
+        process_object.main(process_config, test_mode)
 
 
 if __name__ == '__main__':
