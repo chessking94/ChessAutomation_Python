@@ -147,7 +147,7 @@ class DownloadTWIC(base):
         if result.returncode != 0:
             logging.critical(f'Error merging game files: {result.stderr}')
             raise SystemExit
-        os.rename(merge_name, os.path.join(self.config.get('outputDir'), os.path.basename(merge_name)))
+        os.rename(os.path.join(extract_dir, merge_name), os.path.join(self.config.get('outputDir'), merge_name))
 
         # post-processing cleanup
         os.chdir(os.path.dirname(filename))  # necessary to delete extract_dir
