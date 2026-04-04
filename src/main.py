@@ -44,8 +44,20 @@ def main():
         nargs='?',
         help='Process name'
     )
+
+    # dynamic arguments could be anything, they will be handled by the subprocess
+    parser.add_argument(
+        '--dynamic1',
+        default=None,
+        nargs='?',
+        help='Dynamic argument 1'
+    )
     args = parser.parse_args()
     config_args = vars(args)
+
+    dynamic_args = {
+        'dynamic1': config_args['dynamic1']
+    }
 
     process_name = str(config_args['process']).upper()
 
@@ -64,7 +76,8 @@ def main():
         logging.critical(err_msg)
     else:
         shared_config = misc.get_config('environment', CONFIG_FILE)
-        process_object.set_shared_config(shared_config)
+        process_object.update_config(shared_config)
+        process_object.update_config(dynamic_args)
 
         if process_object.require_pgnextract():
             process_object.check_for_pgnextract()

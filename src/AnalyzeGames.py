@@ -1,10 +1,10 @@
-import json
 import logging
 import os
+from pathlib import Path
+import re
+import shutil
 import socket
 import subprocess
-
-import pika
 
 from base import base
 
@@ -13,115 +13,10 @@ class AnalyzeGames(base):
     abbreviation = 'ANALYZE'
 
     def _go(self):
-        if self.test_mode:
-            filename = ''
-            source = ''
-            timeControlDetail = None
-            af = self._AnalysisFile(filename, source, timeControlDetail)
-            self._process_file(af)
-        else:
-            rabbitmq_host = self.config.get('rabbitmqHost')
-            rabbitmq_user = self.config.get('rabbitmqUser')
-            rabbitmq_pass = self.config.get('rabbitmqPass')
-            rabbitmq_route = self.config.get('rabbitmqRoute')
-            connection = None
-            channel = None
-
-            try:
-                credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_pass)
-                connection_params = pika.ConnectionParameters(
-                    host=rabbitmq_host,
-                    credentials=credentials,
-                    heartbeat=0  # disable connection timeout, otherwise it dies after 60 seconds by default
-                )
-
-                connection = pika.BlockingConnection(connection_params)
-                channel = connection.channel()
-
-                channel.basic_qos(prefetch_count=1)
-                channel.basic_consume(
-                    queue=rabbitmq_route,
-                    on_message_callback=lambda ch, method, properties, body: self._callback(
-                        ch, method, properties, body
-                    )
-                )
-
-                logging.info('Waiting for messages. To exit press CTRL+C')
-                try:
-                    channel.start_consuming()
-                except KeyboardInterrupt:
-                    logging.info('Process stopped by Ctrl+C')
-                except Exception as e:
-                    logging.critical(f'Unexpection exception: {e}')
-                finally:
-                    channel.close()
-                    connection.close()
-
-            except Exception as e:
-                logging.critical(f'Error setting up RabbitMQ: {e}')
-
-                if channel is not None:
-                    channel.close()
-                if connection is not None:
-                    connection.close()
-
-    class _AnalysisFile:
-        def __init__(self, filename: str | None, source: str | None, timeControlDetail: str | None):
-            self.filename = filename
-            self.source = source
-            self.timeControlDetail = timeControlDetail
-
-        def is_valid(self) -> str | None:
-            rtn = None
-            if self.filename is None:
-                rtn = 'Invalid filename'
-
-            if self.source is None:
-                reason = 'Invalid source'
-                if rtn is None:
-                    rtn = reason
-                else:
-                    rtn += f'|{reason}'
-
-            # # TODO: implement proper handling of this someday
-            # if self.timeControlDetail is None:
-            #     reason = 'Invalid time control'
-            #     if rtn is None:
-            #         rtn = reason
-            #     else:
-            #         rtn += f'|{reason}'
-
-            return rtn
-
-    def _callback(self, ch, method, properties, body):
-        message = body.decode()
-        logging.info('Message received')
-
-        try:
-            message_body = json.loads(message)
-            assert isinstance(message_body, dict)
-            filename = message_body.get('filename', None)
-            source = message_body.get('source', None)
-            timeControlDetail = message_body.get('timeControlDetail', None)
-            af = self._AnalysisFile(filename, source, timeControlDetail)
-
-            err = af.is_valid()
-            if err is None:
-                logging.info(f'Filename = {os.path.basename(filename)}')
-                self._process_file(af)
-                ch.basic_ack(delivery_tag=method.delivery_tag)
-            else:
-                logging.error(err)
-                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
-
-        except Exception as e:
-            logging.error(f'Error processing message: {e}')
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
-
-    def _process_file(self, af: _AnalysisFile):
-        clean_env = os.environ.copy()
-        clean_env.pop('VIRTUAL_ENV', None)
-        clean_env.pop('PYTHONPATH', None)
+        analysis_dir = self.config.get('dynamic1')
+        if not os.path.exists(analysis_dir):
+            logging.critical(f"Analysis directory '{analysis_dir}' does not exist")
+            raise SystemExit
 
         python_env = self.config.get('analysisEnv')
         if not os.path.exists(python_env):
@@ -133,10 +28,105 @@ class AnalyzeGames(base):
             logging.critical(f"Analysis program '{analysis_program}' does not exist on {socket.gethostname()}")
             raise SystemExit
 
-        cmd_list = [python_env, analysis_program, '--pgn', af.filename, '--source', af.source]
-        if af.timeControlDetail is not None:
-            cmd_list.extend(['--time', af.timeControlDetail])
-        result = subprocess.run(cmd_list, env=clean_env, capture_output=True, text=True)
-        if result.returncode != 0:
-            logging.critical(f'Error analyzing file: {result.stderr}')
-            raise SystemExit
+        pending_files = [f for f in Path(analysis_dir).iterdir() if f.is_file() and f.suffix == '.pgn']
+
+        # exclude files that have already started being analyzed, denoted by a ".game" file in the same directory
+        inprogress_stems = {f.stem for f in Path(analysis_dir).iterdir() if f.suffix == '.game'}
+        pending_files = [f for f in pending_files if f.stem not in inprogress_stems]
+
+        if self.test_mode:
+            for f in pending_files:
+                gm = self._AnalysisFile(f)
+                msg = f"Pending file: '{os.path.basename(f)}'."
+                err = gm.is_valid()
+                if err is None:
+                    msg += ' Valid: True'
+                else:
+                    msg += f' Invalid: {err}'
+                logging.info(msg)
+        else:
+            for fn in pending_files:
+                file_path = os.path.dirname(fn)
+                af = self._AnalysisFile(fn)
+                err = af.is_valid()
+                if err is not None:
+                    error_path = os.path.join(file_path, 'invalid')
+                    if not os.path.exists(error_path):
+                        os.mkdir(error_path)
+
+                    new_name = os.path.join(error_path, os.path.basename(fn))
+                    os.rename(fn, new_name)
+                    logging.error(f"Unable to parse chess analysis filename '{os.path.basename(fn)}': {err}")
+                else:
+                    inprogress_stems = {f.stem for f in Path(analysis_dir).iterdir() if f.suffix == '.game'}
+                    if Path(af.filename).stem not in inprogress_stems:
+                        af.process_file(python_env, analysis_program)
+
+    class _AnalysisFile:
+        def __init__(self, filename: str):
+            self.filename = filename
+            self.source, self.time_control = self._parse_filename()
+
+        def _parse_filename(self) -> tuple[str, str]:
+            # expectation is the filename is of the form "FreeFormText_Source_TimeControlDetail_yyyyMMdd_hhmmss.pgn"
+            pattern = r'^.+_(?P<source>[^_]+)_(?P<time_control>[^_]+)?_(?P<date>\d{8})_(?P<time>\d{6})\.pgn$'
+
+            match = re.match(pattern, os.path.basename(self.filename))
+            if not match:
+                return (None, None)
+
+            return (match.group('source'), match.group('time_control'))
+
+        def is_valid(self) -> str | None:
+            # TODO: implement proper validation of these someday
+
+            rtn = None
+            if self.source is None:
+                reason = 'Invalid source'
+                if rtn is None:
+                    rtn = reason
+                else:
+                    rtn += f'|{reason}'
+
+            # if self.time_control is None:
+            #     reason = 'Invalid time control'
+            #     if rtn is None:
+            #         rtn = reason
+            #     else:
+            #         rtn += f'|{reason}'
+
+            return rtn
+
+        def process_file(self, analysis_env: str, analysis_program: str):
+            err = self.is_valid()
+            if err is not None:
+                # this should never be hit, but is a safeguard just in case
+                logging.error(f"Unable to process file '{self.filename}': {err}")
+            else:
+                clean_env = os.environ.copy()
+
+                # reset these env vars just in case
+                clean_env.pop('VIRTUAL_ENV', None)
+                clean_env.pop('PYTHONPATH', None)
+
+                cmd_list = [
+                    analysis_env,
+                    analysis_program,
+                    '--pgn', self.filename,
+                    '--source', self.source
+                ]
+                if self.time_control is not None:
+                    cmd_list.extend(['--time', self.time_control])
+
+                result = subprocess.run(cmd_list, env=clean_env, capture_output=True, text=True)
+                if result.returncode != 0:
+                    logging.critical(f'Error analyzing file: {result.stderr}')
+                    raise SystemExit
+
+                # move file to an archive directory
+                if os.path.exists(self.filename):
+                    archive_dir = os.path.join(os.path.dirname(self.filename), 'Archive')
+                    if not os.path.exists(archive_dir):
+                        os.mkdir(archive_dir)
+
+                    shutil.move(self.filename, os.path.join(archive_dir))
